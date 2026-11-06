@@ -1,14 +1,59 @@
+"use client";
+
+import { useState } from "react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
+import toast from "react-hot-toast";
 import ThemeToggle from "./ThemeToggle";
+import { authClient } from "../lib/auth-client";
 
 const links = [
   { href: "/", label: "Home" },
   { href: "/events", label: "Upcoming Events" },
 ];
 
-export default function Navbar() {
+function Avatar({ name, image }: { name: string; image?: string | null }) {
+  const [failed, setFailed] = useState(false);
+
+  if (image && !failed) {
+    return (
+      // eslint-disable-next-line @next/next/no-img-element
+      <img
+        src={image}
+        alt={name}
+        referrerPolicy="no-referrer"
+        onError={() => setFailed(true)}
+        className="h-10 w-10 rounded-full object-cover"
+      />
+    );
+  }
+
   return (
-    <div className="navbar bg-base-100 shadow-sm sticky top-0 z-50 px-4 lg:px-10">
+    <div className="flex h-10 w-10 items-center justify-center rounded-full bg-primary font-bold text-primary-content">
+      {name.charAt(0).toUpperCase()}
+    </div>
+  );
+}
+
+export default function Navbar() {
+  const router = useRouter();
+  const { data: session, isPending } = authClient.useSession();
+  const user = session?.user;
+
+  const closeMenu = () => {
+    (document.activeElement as HTMLElement | null)?.blur();
+  };
+
+  const handleLogout = async () => {
+    closeMenu();
+    await authClient.signOut();
+    toast.success("You have been logged out.");
+    router.push("/");
+    router.refresh();
+  };
+
+  return (
+    <div className="navbar sticky top-0 z-50 bg-base-100 px-4 shadow-sm lg:px-10">
       <div className="navbar-start">
         <div className="dropdown">
           <div tabIndex={0} role="button" className="btn btn-ghost lg:hidden">
@@ -29,11 +74,13 @@ export default function Navbar() {
           </div>
           <ul
             tabIndex={0}
-            className="menu menu-sm dropdown-content bg-base-100 rounded-box z-10 mt-3 w-52 p-2 shadow"
+            className="menu menu-sm dropdown-content z-10 mt-3 w-52 rounded-box bg-base-100 p-2 shadow"
           >
             {links.map((link) => (
               <li key={link.href}>
-                <Link href={link.href}>{link.label}</Link>
+                <Link href={link.href} onClick={closeMenu}>
+                  {link.label}
+                </Link>
               </li>
             ))}
           </ul>
@@ -55,9 +102,52 @@ export default function Navbar() {
 
       <div className="navbar-end gap-2">
         <ThemeToggle />
-        <Link href="/login" className="btn btn-primary">
-          Login
-        </Link>
+
+        {isPending ? (
+          <div className="skeleton h-10 w-10 shrink-0 rounded-full" />
+        ) : user ? (
+          <>
+            <div className="dropdown dropdown-end">
+              <div className="tooltip tooltip-bottom" data-tip={user.name}>
+                <div
+                  tabIndex={0}
+                  role="button"
+                  className="btn btn-circle btn-ghost"
+                >
+                  <Avatar name={user.name} image={user.image} />
+                </div>
+              </div>
+              <ul
+                tabIndex={0}
+                className="menu menu-sm dropdown-content z-10 mt-3 w-52 rounded-box bg-base-100 p-2 shadow"
+              >
+                <li className="menu-title">{user.name}</li>
+                <li>
+                  <Link href="/create-event" onClick={closeMenu}>
+                    Create Event
+                  </Link>
+                </li>
+                <li>
+                  <Link href="/manage-events" onClick={closeMenu}>
+                    Manage Events
+                  </Link>
+                </li>
+                <li>
+                  <Link href="/joined-events" onClick={closeMenu}>
+                    Joined Events
+                  </Link>
+                </li>
+              </ul>
+            </div>
+            <button onClick={handleLogout} className="btn btn-outline btn-primary btn-sm">
+              Logout
+            </button>
+          </>
+        ) : (
+          <Link href="/login" className="btn btn-primary">
+            Login
+          </Link>
+        )}
       </div>
     </div>
   );

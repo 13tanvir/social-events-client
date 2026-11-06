@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import "./globals.css";
 import Navbar from "../components/Navbar";
 import Footer from "../components/Footer";
+import ToasterProvider from "../components/ToasterProvider";
 
 export const metadata: Metadata = {
   title: "UnityHands | Social Events Platform",
@@ -18,6 +19,7 @@ export default function RootLayout({
         <Navbar />
         <main className="grow">{children}</main>
         <Footer />
+        <ToasterProvider />
       </body>
     </html>
   );
