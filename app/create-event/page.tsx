@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation";
 import toast from "react-hot-toast";
 import PrivateRoute from "../../components/PrivateRoute";
 import { authClient } from "../../lib/auth-client";
-import { API_URL } from "../../lib/api";
+import { authFetch } from "../../lib/authFetch";
 
 const eventTypes = [
   "Cleanup",
@@ -52,7 +52,7 @@ function CreateEventForm() {
 
     setLoading(true);
     try {
-      const res = await fetch(API_URL + "/events", {
+      const res = await authFetch("/events", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({

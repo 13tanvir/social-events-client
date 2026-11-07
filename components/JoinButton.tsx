@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import toast from "react-hot-toast";
 import { authClient } from "../lib/auth-client";
-import { API_URL } from "../lib/api";
+import { authFetch } from "../lib/authFetch";
 
 export default function JoinButton({
   eventId,
@@ -24,7 +24,7 @@ export default function JoinButton({
       setJoined(false);
       return;
     }
-    fetch(API_URL + "/joins?email=" + encodeURIComponent(email))
+    authFetch("/joins?email=" + encodeURIComponent(email))
       .then((res) => res.json())
       .then((list: { eventId: string }[]) => {
         setJoined(list.some((item) => item.eventId === eventId));
@@ -41,7 +41,7 @@ export default function JoinButton({
 
     setLoading(true);
     try {
-      const res = await fetch(API_URL + "/joins", {
+      const res = await authFetch("/joins", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({

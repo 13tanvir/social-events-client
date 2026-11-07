@@ -6,7 +6,7 @@ import PrivateRoute from "../../components/PrivateRoute";
 import EventCard from "../../components/EventCard";
 import EventCardSkeleton from "../../components/EventCardSkeleton";
 import { authClient } from "../../lib/auth-client";
-import { API_URL } from "../../lib/api";
+import { authFetch } from "../../lib/authFetch";
 
 type JoinedItem = {
   _id: string;
@@ -26,7 +26,7 @@ function JoinedList() {
 
   useEffect(() => {
     if (!email) return;
-    fetch(API_URL + "/joins?email=" + encodeURIComponent(email))
+    authFetch("/joins?email=" + encodeURIComponent(email))
       .then((res) => {
         if (!res.ok) throw new Error("failed");
         return res.json();

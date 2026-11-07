@@ -6,7 +6,7 @@ import toast from "react-hot-toast";
 import PrivateRoute from "../../components/PrivateRoute";
 import { EventItem, formatDate } from "../../components/EventCard";
 import { authClient } from "../../lib/auth-client";
-import { API_URL } from "../../lib/api";
+import { authFetch } from "../../lib/authFetch";
 
 const eventTypes = [
   "Cleanup",
@@ -32,8 +32,8 @@ function ManageList() {
   const loadEvents = useCallback(async () => {
     if (!email) return;
     try {
-      const res = await fetch(
-        API_URL + "/my-events?email=" + encodeURIComponent(email)
+      const res = await authFetch(
+        "/my-events?email=" + encodeURIComponent(email)
       );
       if (!res.ok) throw new Error("failed");
       setEvents(await res.json());
@@ -78,7 +78,7 @@ function ManageList() {
 
     setBusy(true);
     try {
-      const res = await fetch(API_URL + "/events/" + editing._id, {
+      const res = await authFetch("/events/" + editing._id, {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -110,9 +110,8 @@ function ManageList() {
     if (!deleting || !email) return;
     setBusy(true);
     try {
-      const res = await fetch(
-        API_URL +
-          "/events/" +
+      const res = await authFetch(
+        "/events/" +
           deleting._id +
           "?email=" +
           encodeURIComponent(email),
