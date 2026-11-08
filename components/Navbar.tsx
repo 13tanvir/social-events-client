@@ -122,6 +122,7 @@ export default function Navbar() {
                 className="menu menu-sm dropdown-content z-10 mt-3 w-52 rounded-box bg-base-100 p-2 shadow"
               >
                 <li className="menu-title">{user.name}</li>
+                <li><Link href="/profile" onClick={closeMenu}>My Profile</Link></li>
                 <li>
                   <Link href="/create-event" onClick={closeMenu}>
                     Create Event
